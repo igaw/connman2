@@ -126,6 +126,12 @@ ell_sources = ell/private.h \
 ell_libell_internal_la_SOURCES = $(ell_headers) $(ell_sources)
 endif
 
+bin_PROGRAMS = src/connmand2
+
+src_connmand2_SOURCES = src/main.c
+src_connmand2_LDADD = $(ell_ldadd) -ldl
+src_connmand2_DEPENDENCIES = $(ell_dependencies)
+
 AM_CFLAGS = $(ell_cflags) -fvisibility=hidden
 
 DISTCLEANFILES = $(BUILT_SOURCES)
