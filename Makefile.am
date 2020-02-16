@@ -32,6 +32,7 @@ ell_headers = ell/util.h \
 			ell/checksum.h \
 			ell/netlink.h \
 			ell/genl.h \
+			ell/rtnl.h \
 			ell/dbus.h \
 			ell/dbus-service.h \
 			ell/dbus-client.h \
@@ -78,6 +79,7 @@ ell_sources = ell/private.h \
 			ell/netlink.c \
 			ell/genl-private.h \
 			ell/genl.c \
+			ell/rtnl.c \
 			ell/dbus-private.h \
 			ell/dbus.c \
 			ell/dbus-message.c \
@@ -128,7 +130,7 @@ endif
 
 bin_PROGRAMS = src/connmand2
 
-src_connmand2_SOURCES = src/main.c
+src_connmand2_SOURCES = src/main.c src/rtconf.h src/rtconf.c
 src_connmand2_LDADD = $(ell_ldadd) -ldl
 src_connmand2_DEPENDENCIES = $(ell_dependencies)
 

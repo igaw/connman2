@@ -8,25 +8,18 @@
 #endif
 
 #include <signal.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <errno.h>
+#include <asm/types.h>
+#include <sys/socket.h>
+#include <linux/netlink.h>
+#include <linux/rtnetlink.h>
+#include <net/if.h>
+
 #include <ell/ell.h>
 
-static struct l_timeout *timeout;
-static bool terminating;
-
-static void main_loop_quit(struct l_timeout *timeout, void *user_data)
-{
-	l_main_quit();
-}
-
-static void connman_shutdown(void)
-{
-	if (terminating)
-		return;
-
-	terminating = true;
-
-	timeout = l_timeout_create(1, main_loop_quit, NULL, NULL);
-}
+#include "rtconf.h"
 
 static void signal_handler(uint32_t signo, void *user_data)
 {
@@ -34,14 +27,15 @@ static void signal_handler(uint32_t signo, void *user_data)
 	case SIGINT:
 	case SIGTERM:
 		l_info("Terminate");
-		connman_shutdown();
+		l_main_quit();
 		break;
 	}
 }
 
 int main(int argc, char *argv[])
 {
-	int exit_status;
+	struct rtconf *rtconf;
+	int exit_status = EXIT_SUCCESS;
 
 	l_log_set_stderr();
 
@@ -52,10 +46,17 @@ int main(int argc, char *argv[])
 
 	l_debug_enable("*");
 
+	rtconf = rtconf_create();
+	if (!rtconf) {
+		exit_status = EXIT_FAILURE;
+		goto done;
+	}
+
 	exit_status = l_main_run_with_signal(signal_handler, NULL);
 
-	l_timeout_remove(timeout);
+	rtconf_destroy(rtconf);
 
+done:
 	l_main_exit();
 
 	return exit_status;
